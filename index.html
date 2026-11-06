@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chúc Mừng Ngày Nhà Giáo Việt Nam 20/11</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+            background-color: #222;
+        }
+
+        /* --- TRÌNH CHIẾU ẢNH NỀN TRƯỢT NGANG TỪ TRÁI SANG PHẢI --- */
+        .bg-slideshow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+        .bg-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transform: translateX(-100%);
+            transition: transform 1.5s ease-in-out, opacity 1.5s ease-in-out;
+        }
+        .bg-slide.active {
+            opacity: 0.8;
+            transform: translateX(0);
+        }
+        .bg-slide.exit {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        /* Lớp phủ màu nhẹ lên ảnh nền */
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Các hạt sáng lấp lánh bay ở nền */
+        .bg-particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatParticle linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes floatParticle {
+            0% {
+                transform: translateY(105vh) scale(0);
+                opacity: 0;
+            }
+            50% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-10vh) scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* Khung thiệp chính giữa, độ trong suốt 0.45 */
+        .card {
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 25px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            max-width: 650px;
+            width: 100%;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Trạng thái khi thu gọn lại chỉ còn nút con mắt ở góc trên bên trái */
+        .card.minimized {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            max-width: 50px;
+            padding: 0;
+            border-radius: 50%;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.85);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border: 2px solid #ff416c;
+        }
+
+        /* Ẩn các thành phần bên trong khi thu gọn */
+        .card.minimized h1,
+        .card.minimized h2,
+        .card.minimized .message,
+        .card.minimized .btn,
+        .card.minimized #flowerImageContainer,
+        .card.minimized .signature,
+        .card.minimized .card::before {
+            display: none !important;
+        }
+
+        /* Biến nút con mắt thành toàn bộ khung tròn khi thu gọn */
+        .card.minimized .card-toggle-btn {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: transparent;
+            border-radius: 50%;
+            font-size: 22px;
+            box-shadow: none;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 10px;
+            background: linear-gradient(to right, #ff416c, #ff4b2b, #ff416c);
+            background-size: 200% auto;
+            animation: gradientMove 4s linear infinite;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+
+        /* Nút con mắt ở góc trên bên phải khi mở rộng */
+        .card-toggle-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid #ff416c;
+            color: #ff416c;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            z-index: 20;
+        }
+        .card-toggle-btn:hover {
+            background: #ff416c;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        h1 {
+            color: #d9534f;
+            margin-bottom: 10px;
+            font-size: 32px;
+            font-family: 'Dancing Script', cursive;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(255,255,255,0.8);
+            transition: all 0.3s ease;
+        }
+        h2 {
+            color: #333;
+            font-size: 17px;
+            margin-bottom: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .message {
+            background: rgba(255, 255, 255, 0.55);
+            border-left: 4px solid #ff416c;
+            padding: 20px;
+            text-align: left;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            line-height: 1.7;
+            color: #222;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .btn {
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 65, 108, 0.4);
+        }
+        .btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(255, 65, 108, 0.6);
+        }
+        .signature {
+            margin-top: 25px;
+            font-style: italic;
+            color: #444;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        /* --- STYLES CHO ẢNH VÀ VIDEO KỶ NIỆM BÊN TRONG --- */
+        .media-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            max-height: 350px;
+            overflow-y: auto;
+            padding: 5px;
+            transition: all 0.3s ease;
+        }
+        .preview-media {
+            width: 130px; 
+            height: 130px; 
+            object-fit: cover; 
+            border-radius: 12px; 
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            background: #000;
+        }
+        .preview-media:hover {
+            transform: scale(1.08) rotate(1deg);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.25);
+        }
+
+        /* Modal Phóng to Ảnh / Video */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 999; 
+            top: 0;
+            left: 0;
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0,0,0,0.85); 
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            max-width: 90%;
+            max-height: 80vh;
+            border-radius: 12px;
+            box-shadow: 0 0 25px rgba(255,255,255,0.3);
+            animation: zoomEffect 0.3s forwards;
+        }
+        .close-btn {
+            position: absolute;
+            top: 25px;
+            right: 35px;
+            color: #fff;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+        }
+        .close-btn:hover {
+            color: #ff416c;
+        }
+        @keyframes zoomEffect {
+            from { transform: scale(0.7); opacity: 0; } 
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* --- THANH ĐIỀU KHIỂN NHẠC VÀ ĐĨA NHẠC XOAY --- */
+        .music-box {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(5px);
+            padding: 10px 16px;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .music-icon {
+            width: 32px;
+            height: 32px;
+            background: radial-gradient(circle, #333 30%, #111 70%);
+            border-radius: 50%;
+            border: 2px solid #555;
+            position: relative;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            animation: spin 2s linear infinite;
+            animation-play-state: paused;
+            flex-shrink: 0;
+        }
+        .music-icon::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            background: #ff416c;
+            border-radius: 50%;
+            border: 2px solid #fff;
+        }
+        .music-icon::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 22px;
+            height: 22px;
+            border: 1px dashed rgba(255, 255, 255, 0.25);
+            border-radius: 50%;
+        }
+        .music-btn {
+            background: #ff416c;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .music-btn:hover {
+            background: #e0355b;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* --- HIỆU ỨNG HOA RƠI --- */
+        .falling-flower {
+            position: fixed;
+            top: -50px;
+            font-size: 24px;
+            z-index: 99;
+            user-select: none;
+            pointer-events: none;
+            animation: fall linear forwards;
+        }
+        @keyframes fall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TRÌNH CHIẾU ẢNH NỀN TRƯỢT NGANG TỪ TRÁI SANG PHẢI (ẢNH 9 ĐẾN ẢNH 14) -->
+    <div class="bg-slideshow" id="bgSlideshow">
+        <img src="anh9.jpg" class="bg-slide active" alt="Bg 9">
+        <img src="anh10.jpg" class="bg-slide" alt="Bg 10">
+        <img src="anh11.jpg" class="bg-slide" alt="Bg 11">
+        <img src="anh12.jpg" class="bg-slide" alt="Bg 12">
+        <img src="anh13.jpg" class="bg-slide" alt="Bg 13">
+        <img src="anh14.jpg" class="bg-slide" alt="Bg 14">
+    </div>
+    <div class="bg-overlay"></div>
+
+    <!-- Thanh điều khiển nhạc -->
+    <div class="music-box">
+        <div class="music-icon" id="musicIcon"></div>
+        <button class="music-btn" onclick="togglePlayMusic()" id="playPauseBtn">Bật nhạc</button>
+        <button class="music-btn" onclick="doiBaiHat()" style="background: #ff4b2b;">Đổi bài ⏭</button>
+        <span id="songName" style="font-size: 12px; color: #333; font-weight: 600;">Bài 1/8</span>
+    </div>
+
+    <!-- Thẻ Audio -->
+    <audio id="bgMusic">
+        <source id="audioSource" src="nhac1.mp3" type="audio/mp3">
+        Trình duyệt của bạn không hỗ trợ thẻ audio.
+    </audio>
+
+    <div class="card" id="mainCard">
+        <!-- Nút con mắt để thu gọn hoàn toàn thành một nút tròn ở góc trái -->
+        <button class="card-toggle-btn" id="collapseBtn" onclick="toggleCardPosition()" title="Thu gọn / Phóng to">👁️</button>
+
+        <h1>TRI ÂN THẦY CÔ 20/11</h1>
+        <h2>Chào mừng ngày Nhà giáo Việt Nam</h2>
+        
+        <div class="message">
+            <p>Dù đã rời mái trường cấp 2, nhưng em vẫn luôn nhớ về những bài giảng tâm huyết và sự dìu dắt của cô ngày nào. Nhân ngày 20/11, em xin kính chúc cô thật nhiều sức khỏe, luôn vui vẻ và hạnh phúc với sự nghiệp trồng người cao quý!</p>
+        </div>
+
+        <button class="btn" onclick="tangHoa()">Kỷ niệm 🌹</button>
+
+        <!-- Phần chứa danh sách Ảnh và Video bên trong -->
+        <div id="flowerImageContainer" style="margin-top: 20px; display: none;">
+            <div class="media-container">
+                <img src="anh1.jpg" alt="Ảnh 1" class="preview-media" onclick="moXemMedia(this)">
+                <img src="anh2.jpg" alt="Ảnh 2" class="preview-media" onclick="moXemMedia(this)">
+                <img src="anh3.jpg" alt="Ảnh 3" class="preview-media" onclick="moXemMedia(this)">
+                <img src="anh4.jpg" alt="Ảnh 4" class="preview-media" onclick="moXemMedia(this)">
+                <img src="anh5.jpg" alt="Ảnh 5" class="preview-media" onclick="moXemMedia(this)">
+                <img src="anh6.jpg" alt="Ảnh 6" class="preview-media" onclick="moXemMedia(this)">
+                <img src="anh7.jpg" alt="Ảnh 7" class="preview-media" onclick="moXemMedia(this)">
+                <img src="anh8.jpg" alt="Ảnh 8" class="preview-media" onclick="moXemMedia(this)">
+                <video src="video1.mp4" class="preview-media" muted onclick="moXemMedia(this)"></video>
+                <video src="video2.mp4" class="preview-media" muted onclick="moXemMedia(this)"></video>
+                <video src="video3.mp4" class="preview-media" muted onclick="moXemMedia(this)"></video>
+            </div>
+            
+            <p style="margin-top: 10px; font-weight: bold; color: #d9534f;">🌸 Những khoảnh khắc và đóa hoa tri ân gửi đến cô! 🌸</p>
+        </div>
+
+        <div class="signature">
+            — Thân kính gửi từ học trò —
+        </div>
+    </div>
+
+    <!-- Modal Phóng to Ảnh / Video -->
+    <div id="myModal" class="modal" onclick="dongXemMedia(event)">
+        <span class="close-btn" onclick="dongXemMedia(event)">&times;</span>
+        <div id="modalBody" style="display: flex; justify-content: center; align-items: center; width: 100%; height: 100%;"></div>
+    </div>
+
+    <script>
+        // Hàm xử lý bấm vào icon con mắt để thu gọn thành nút tròn ở góc trái hoặc phóng to về giữa
+        let isMinimized = false;
+        function toggleCardPosition() {
+            isMinimized = !isMinimized;
+            const mainCard = document.getElementById('mainCard');
+            const collapseBtn = document.getElementById('collapseBtn');
+
+            if (isMinimized) {
+                mainCard.classList.add('minimized');
+                collapseBtn.title = "Phóng to khung thiệp";
+            } else {
+                mainCard.classList.remove('minimized');
+                collapseBtn.title = "Thu gọn khung thiệp";
+            }
+        }
+
+        // Hiệu ứng chuyển slide ảnh nền trượt ngang từ trái sang phải vòng tròn
+        let currentBgIndex = 0;
+        const bgSlides = document.querySelectorAll('.bg-slide');
+        function slideBackground() {
+            if(bgSlides.length === 0) return;
+            
+            bgSlides[currentBgIndex].classList.remove('active');
+            bgSlides[currentBgIndex].classList.add('exit');
+            
+            let oldIndex = currentBgIndex;
+            setTimeout(() => {
+                bgSlides[oldIndex].classList.remove('exit');
+            }, 1500);
+
+            currentBgIndex = (currentBgIndex + 1) % bgSlides.length;
+            bgSlides[currentBgIndex].classList.add('active');
+        }
+        setInterval(slideBackground, 5000);
+
+        // Tự động tạo các hạt sáng lấp lánh bay ở nền
+        function taoHạtNền() {
+            const numParticles = 25;
+            for (let i = 0; i < numParticles; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('bg-particle');
+                const size = Math.random() * 8 + 4 + 'px';
+                particle.style.width = size;
+                particle.style.height = size;
+                particle.style.left = Math.random() * window.innerWidth + 'px';
+                particle.style.animationDuration = (Math.random() * 8 + 5) + 's';
+                particle.style.animationDelay = (Math.random() * 5) + 's';
+                document.body.appendChild(particle);
+            }
+        }
+        taoHạtNền();
+
+        var danhSachBaiHat = ["nhac1.mp3", "nhac2.mp3", "nhac3.mp3", "nhac4.mp3", "nhac5.mp3", "nhac6.mp3", "nhac7.mp3", "nhac8.mp3"];
+        var baiHienTai = 0;
+
+        var music = document.getElementById("bgMusic");
+        var audioSource = document.getElementById("audioSource");
+        var playPauseBtn = document.getElementById("playPauseBtn");
+        var musicIcon = document.getElementById("musicIcon");
+        var songNameText = document.getElementById("songName");
+        var isPlaying = false;
+
+        function togglePlayMusic() {
+            if (isPlaying) {
+                music.pause();
+                playPauseBtn.innerText = "Bật nhạc";
+                musicIcon.style.animationPlayState = "paused";
+                isPlaying = false;
+            } else {
+                music.play().then(() => {
+                    playPauseBtn.innerText = "Tạm dừng";
+                    musicIcon.style.animationPlayState = "running";
+                    isPlaying = true;
+                }).catch(error => {
+                    console.log("Cần tương tác trang trước khi phát nhạc");
+                });
+            }
+        }
+
+        function doiBaiHat() {
+            baiHienTai = (baiHienTai + 1) % danhSachBaiHat.length; 
+            audioSource.src = danhSachBaiHat[baiHienTai];
+            songNameText.innerText = "Bài " + (baiHienTai + 1) + "/8";
+            
+            music.load(); 
+            music.play().then(() => {
+                playPauseBtn.innerText = "Tạm dừng";
+                musicIcon.style.animationPlayState = "running";
+                isPlaying = true;
+            }).catch(error => {
+                console.log("Không thể chuyển bài tự động");
+            });
+        }
+
+        music.addEventListener('ended', function() {
+            doiBaiHat();
+        });
+
+        function tangHoa() {
+            document.getElementById('flowerImageContainer').style.display = 'block';
+            taoHieuUngHoaRoi();
+        }
+
+        function taoHieuUngHoaRoi() {
+            const symbols = ['🌸', '🌹', '✨', '💐', '🌺', '💖'];
+            for (let i = 0; i < 25; i++) {
+                setTimeout(() => {
+                    const flower = document.createElement('div');
+                    flower.classList.add('falling-flower');
+                    flower.innerHTML = symbols[Math.floor(Math.random() * symbols.length)];
+                    flower.style.left = Math.random() * window.innerWidth + 'px';
+                    flower.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                    flower.style.fontSize = (Math.random() * 20 + 16) + 'px';
+                    document.body.appendChild(flower);
+
+                    setTimeout(() => {
+                        flower.remove();
+                    }, 5000);
+                }, i * 100);
+            }
+        }
+
+        function moXemMedia(element) {
+            var modal = document.getElementById("myModal");
+            var modalBody = document.getElementById("modalBody");
+            modal.style.display = "flex";
+            modalBody.innerHTML = "";
+
+            if (element.tagName.toLowerCase() === 'video') {
+                var bigVideo = document.createElement('video');
+                bigVideo.src = element.src;
+                bigVideo.controls = true;
+                bigVideo.autoplay = true;
+                bigVideo.className = "modal-content";
+                modalBody.appendChild(bigVideo);
+            } else {
+                var bigImg = document.createElement('img');
+                bigImg.src = element.src;
+                bigImg.className = "modal-content";
+                modalBody.appendChild(bigImg);
+            }
+        }
+
+        function dongXemMedia(event) {
+            if (event.target.id === 'myModal' || event.target.classList.contains('close-btn')) {
+                var modal = document.getElementById("myModal");
+                modal.style.display = "none";
+                document.getElementById("modalBody").innerHTML = "";
+            }
+        }
+    </script>
+
+</body>
+</html>
